@@ -33,7 +33,7 @@ if __name__ == '__main__':
         learning_rate=2.4E-2,
         iteration_multiplier=10,
         max_iteration=5E2,
-        starting_point=None,
+        starting_point=np.array([10, 4]),
         reset=False,
         reset_pause=30,
         interval=100,

@@ -31,7 +31,7 @@ def _gd_by_step(loss_function, gradient_function, variable_count,
                 max_iteration=1E5, starting_point=None):
     i = 0
     theta_pre = _np.zeros(variable_count) \
-        if starting_point is not None else starting_point
+        if starting_point is None else starting_point
     loss_pre = loss_function(theta_pre)
     yield _GDResult(theta_pre, loss_pre, 0., i,
                     theta_pre, loss_pre)
@@ -110,6 +110,7 @@ def make_animation(figure, x_vector, y_vector, x_label='X', y_label='Y',
 
     if starting_point is None:
         starting_point = _np.zeros(2)
+    starting_point = starting_point.astype(float)
 
     model = LRGDByStep1D(
         x_vector=x_vector, y_vector=y_vector,
@@ -175,7 +176,7 @@ def make_animation(figure, x_vector, y_vector, x_label='X', y_label='Y',
             self._axes.set_xlabel('Iteration')
             self._axes.set_ylabel('Loss')
             self._axes.set_xlim((0, max_iteration))
-            self._axes.set_ylim((0, model.loss_function(_np.array([0, 0]))))
+            self._axes.set_ylim((0, model.loss_function(starting_point)))
 
         def update(self, gd_res):
             iter_p = max(gd_res.iteration - iteration_multiplier, 0)
