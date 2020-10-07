@@ -3,49 +3,7 @@
 
 import matplotlib.animation as _anime
 import numpy as _np
-
-
-class _GDResult:
-    __slots__ = ['theta', 'loss', 'converge', 'iteration',
-                 'theta_pre', 'loss_pre']
-    __optional__ = ['theta_pre', 'loss_pre']
-
-    def __init__(self, theta, loss, converge, iteration,
-                 theta_pre, loss_pre):
-        self.theta = theta
-        self.loss = loss
-        self.converge = converge
-        self.iteration = iteration
-        self.theta_pre = theta_pre
-        self.loss_pre = loss_pre
-
-    def __repr__(self):
-        idt = [f'{attr}={getattr(self, attr)}'
-               for attr in self.__slots__
-               if attr not in self.__optional__]
-        return f"[GD result - {', '.join(idt)}]"
-
-
-def _gd_by_step(loss_function, gradient_function, variable_count,
-                learning_rate=1E-2, iteration_multiplier=1,
-                max_iteration=1E5, starting_point=None):
-    i = 0
-    theta_pre = _np.zeros(variable_count) \
-        if starting_point is None else starting_point
-    loss_pre = loss_function(theta_pre)
-    yield _GDResult(theta_pre, loss_pre, 0., i,
-                    theta_pre, loss_pre)
-    theta = theta_pre.copy()
-    while i < max_iteration:
-        for j in range(iteration_multiplier):
-            gradient = gradient_function(theta)
-            theta -= learning_rate * gradient
-        loss = loss_function(theta)
-        converge = abs(loss - loss_pre)
-        i += iteration_multiplier
-        yield _GDResult(theta, loss, converge, i,
-                        theta_pre, loss_pre)
-        theta_pre, loss_pre = theta.copy(), loss.copy()
+import utils as _utils
 
 
 class LRGDByStep:
@@ -59,7 +17,10 @@ class LRGDByStep:
         self._learning_rate = learning_rate
         self._iteration_multiplier = iteration_multiplier
         self._max_iteration = max_iteration
-        self._starting_point = starting_point
+        if starting_point is None:
+            self._starting_point = _np.zeros(self._n_feature)
+        else:
+            self._starting_point = starting_point
         self._gd = None
         self.reset()
 
@@ -81,34 +42,23 @@ class LRGDByStep:
             return None
 
     def solve(self, precision=1E-12):
-        solver = _gd_by_step(
+        return _utils.gradient_descent(
             loss_function=self.loss_function,
             gradient_function=self.gradient_function,
-            variable_count=self._n_feature,
+            starting_point=self._starting_point,
             learning_rate=self._learning_rate,
             max_iteration=self._max_iteration,
-            starting_point=self._starting_point,
+            precision=precision,
         )
-        res = next(solver)
-        while True:
-            try:
-                res = next(solver)
-            except StopIteration:
-                break
-            else:
-                if res.converge < precision:
-                    break
-        return res
 
     def reset(self):
-        self._gd = _gd_by_step(
+        self._gd = _utils.gradient_descent_step(
             loss_function=self.loss_function,
             gradient_function=self.gradient_function,
-            variable_count=self._n_feature,
+            starting_point=self._starting_point,
             learning_rate=self._learning_rate,
             iteration_multiplier=self._iteration_multiplier,
             max_iteration=self._max_iteration,
-            starting_point=self._starting_point,
         )
 
 

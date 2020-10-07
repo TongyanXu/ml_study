@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
 """doc string"""
 
-from utils import gradient_descent as _gd
-
-_default_gd_cfg = dict(
-    learning_rate=1E-2,
-    precision=1E-16,
-    max_iter=1E5,
-    starting_point=None,
-)
+import numpy as _np
+import utils as _utils
 
 
 def linear_regression_by_gd(x, y, gd_cfg=None):
@@ -23,10 +17,13 @@ def linear_regression_by_gd(x, y, gd_cfg=None):
         v = x @ theta.T - y
         return v.T @ x / n_sample
 
-    _gd_cfg = gd_cfg or _default_gd_cfg
-    return _gd.simple_gradient_descent(
+    _gd_cfg = dict(starting_point=_np.zeros(n_feature))
+    if gd_cfg:
+        _gd_cfg.update(gd_cfg)
+
+    res = _utils.gradient_descent(
         loss_function=loss_function,
         gradient_function=gradient_function,
-        variable_count=n_feature,
         **_gd_cfg
     )
+    return res.theta
