@@ -138,9 +138,9 @@ def make_animation(figure, x_vector, y_vector, x_label='X', y_label='Y',
             self._axes.legend(loc='lower right')
 
         def update(self, gd_res):
-            y1_0 = gd_res.theta @ _np.array([1, min(x_vector)])
-            y1_1 = gd_res.theta @ _np.array([1, max(x_vector)])
-            self._line.set_ydata([y1_0, y1_1])
+            y0 = gd_res.theta @ _np.array([1, min(x_vector)])
+            y1 = gd_res.theta @ _np.array([1, max(x_vector)])
+            self._line.set_ydata([y0, y1])
 
         def reset(self):
             pass
@@ -161,9 +161,9 @@ def make_animation(figure, x_vector, y_vector, x_label='X', y_label='Y',
             self._axes.set_ylabel('Theta 1')
 
         def update(self, gd_res):
-            x2 = [gd_res.theta_pre[0], gd_res.theta[0]]
-            y2 = [gd_res.theta_pre[1], gd_res.theta[1]]
-            self._axes.plot(x2, y2, c='red')
+            x = [gd_res.theta_pre[0], gd_res.theta[0]]
+            y = [gd_res.theta_pre[1], gd_res.theta[1]]
+            self._axes.plot(x, y, c='red')
 
         def reset(self):
             self._axes.lines = [self._axes.lines[0]]
@@ -179,9 +179,9 @@ def make_animation(figure, x_vector, y_vector, x_label='X', y_label='Y',
 
         def update(self, gd_res):
             iter_p = max(gd_res.iteration - iteration_multiplier, 0)
-            x3 = [iter_p, gd_res.iteration]
-            y3 = [gd_res.loss_pre, gd_res.loss]
-            self._axes.plot(x3, y3, c='green')
+            x = [iter_p, gd_res.iteration]
+            y = [gd_res.loss_pre, gd_res.loss]
+            self._axes.plot(x, y, c='green')
 
         def reset(self):
             self._axes.lines = [self._axes.lines[0]]

@@ -12,8 +12,8 @@ def load_txt_data(file_name):
     return data.astype(float)
 
 
-def normalize(x):
-    return (x - x.mean()) / x.std()
+def normalize(v):
+    return (v - v.mean()) / v.std()
 
 
 if __name__ == '__main__':
