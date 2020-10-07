@@ -32,11 +32,12 @@ if __name__ == '__main__':
         y_label='Profit in $10,000s',
         learning_rate=2.4E-2,
         iteration_multiplier=10,
-        max_iteration=5E2,
-        starting_point=np.array([10, 4]),
-        reset=False,
+        max_iteration=1E3,
+        starting_point=None,
+        reset=True,
         reset_pause=30,
-        interval=100,
+        interval=10,
+        contour_center='middle',
     )
     # animation.save('test.gif', writer='pillow')
     plt.show()

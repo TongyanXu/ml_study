@@ -27,7 +27,7 @@ class _GDResult:
 
 
 def _gd_by_step(loss_function, gradient_function, variable_count,
-                learning_rate=1E-2, iteration_multiplier=10,
+                learning_rate=1E-2, iteration_multiplier=1,
                 max_iteration=1E5, starting_point=None):
     i = 0
     theta_pre = _np.zeros(variable_count) \
@@ -80,6 +80,26 @@ class LRGDByStep:
         except StopIteration:
             return None
 
+    def solve(self, precision=1E-12):
+        solver = _gd_by_step(
+            loss_function=self.loss_function,
+            gradient_function=self.gradient_function,
+            variable_count=self._n_feature,
+            learning_rate=self._learning_rate,
+            max_iteration=self._max_iteration,
+            starting_point=self._starting_point,
+        )
+        res = next(solver)
+        while True:
+            try:
+                res = next(solver)
+            except StopIteration:
+                break
+            else:
+                if res.converge < precision:
+                    break
+        return res
+
     def reset(self):
         self._gd = _gd_by_step(
             loss_function=self.loss_function,
@@ -103,10 +123,14 @@ class LRGDByStep1D(LRGDByStep):
                          starting_point)
 
 
+def _extend(x1, x2, factor=4):
+    return x1 * (factor + 1) / factor - x2 / factor
+
+
 def make_animation(figure, x_vector, y_vector, x_label='X', y_label='Y',
-                   learning_rate=1E-2, iteration_multiplier=10,
-                   max_iteration=1E5, starting_point=None,
-                   reset=True, reset_pause=30, interval=100):
+                   learning_rate=1E-2, iteration_multiplier=10, max_iteration=1E5,
+                   starting_point=None, solver_precision=1E-12,
+                   reset=True, reset_pause=30, interval=100, contour_center='solution'):
 
     if starting_point is None:
         starting_point = _np.zeros(2)
@@ -119,6 +143,7 @@ def make_animation(figure, x_vector, y_vector, x_label='X', y_label='Y',
         max_iteration=max_iteration,
         starting_point=starting_point,
     )
+    solution = model.solve(solver_precision)
 
     class _ScatterPlot:
 
@@ -150,16 +175,40 @@ def make_animation(figure, x_vector, y_vector, x_label='X', y_label='Y',
 
         def __init__(self, axes):
             self._axes = axes
-            theta_0 = _np.arange(-10, 10.2, 0.2)
-            theta_1 = _np.arange(-1, 4.05, 0.05)
+            theta0, theta1, levels = self._contour_range()
             loss = _np.array([[model.loss_function(_np.array([t0, t1]))
-                               for t0 in theta_0] for t1 in theta_1])
-            x_theta, y_theta = _np.meshgrid(theta_0, theta_1)
-            contour_levels = [0, 5, 10, 20, 40, 80, 160, 320, 640]
-            self._contour = axes.contour(x_theta, y_theta, loss,
-                                         levels=contour_levels)
+                               for t0 in theta0] for t1 in theta1])
+            x_theta, y_theta = _np.meshgrid(theta0, theta1)
+            self._contour = self._axes.contour(x_theta, y_theta, loss,
+                                               levels=levels)
             self._axes.set_xlabel('Theta 0')
             self._axes.set_ylabel('Theta 1')
+
+        @staticmethod
+        def _contour_range():
+            theta0_beg = _extend(starting_point[0], solution.theta[0])
+            theta1_beg = _extend(starting_point[1], solution.theta[1])
+            theta0_end = _extend(solution.theta[0], starting_point[0])
+            theta1_end = _extend(solution.theta[1], starting_point[1])
+
+            if contour_center == 'solution':
+                theta0_end += solution.theta[0] - starting_point[0]
+                theta1_end += solution.theta[1] - starting_point[1]
+
+            theta0 = _np.linspace(theta0_beg, theta0_end, 101)
+            theta1 = _np.linspace(theta1_beg, theta1_end, 101)
+
+            theta0_lv_beg = _extend(theta0_beg, theta0_end, 3)
+            theta0_lv_end = _extend(theta0_end, theta0_beg, 3)
+            theta1_lv_beg = _extend(theta1_beg, theta1_end, 3)
+            theta1_lv_end = _extend(theta1_end, theta1_beg, 3)
+
+            theta0_lv = _np.linspace(theta0_lv_beg, theta0_lv_end, 16)
+            theta1_lv = _np.linspace(theta1_lv_beg, theta1_lv_end, 16)
+
+            levels = [model.loss_function(_np.array([t0, t1]))
+                      for t0, t1 in zip(theta0_lv, theta1_lv)]
+            return theta0, theta1, sorted(levels)
 
         def update(self, gd_res):
             x = [gd_res.theta_pre[0], gd_res.theta[0]]
