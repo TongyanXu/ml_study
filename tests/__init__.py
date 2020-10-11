@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""doc string"""
+"""testings"""
 
 if __name__ == '__main__':
     pass

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""doc string"""
+"""utility functions"""
 
-from .gradient_descent import gradient_descent, gradient_descent_step
+from .fast_instance import FastInstance
 
 
 if __name__ == '__main__':

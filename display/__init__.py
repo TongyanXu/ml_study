@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""doc string"""
+"""display"""
 
-from .lr_gd_anime import make_animation
+from . import lr_anime
 
 
 if __name__ == '__main__':
