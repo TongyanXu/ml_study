@@ -164,67 +164,68 @@ class LogisticRegression(RegressionModel):
         raise NotImplementedError
 
 
-# if __name__ == '__main__':
-#     import optimizer as _opt
-#
-#     # data
-#     lin_d = _np.loadtxt('linear_data.txt', delimiter=',')
-#     lin_d = _np.insert(lin_d, 0, values=1, axis=1)
-#     lin_x = lin_d[:, :2]
-#     lin_y = lin_d[:, 2]
-#
-#     log_d = _np.loadtxt('logistic_data.txt', delimiter=',')
-#     log_d = _np.insert(log_d, 0, values=1, axis=1)
-#     log_x = log_d[:, :3]
-#     log_y = log_d[:, 3]
-#
-#     # optimizer
-#     gd = _opt.GradientDescent(
-#         l_rate=1E-2,
-#         max_iter=1E5,
-#         g_tol=1E-5,
-#         g_norm=2,
-#     )
-#     cg = _opt.ConjugateGradientScipy(
-#         max_iter=1E5,
-#         g_tol=1E-5,
-#         g_norm=2,
-#     )
-#
-#     # model
-#     lin_model = LinearRegression(lin_x, lin_y)
-#     lin_model.train(
-#         optimizer=gd,
-#     )
-#     print(lin_model.result)
-#
-#     log_model = LogisticRegression(log_x, log_y)
-#     log_model.train(
-#         optimizer=cg,
-#     )
-#     print(log_model.result)
-#
-#     # generator
-#     gd_gen = _opt.GradientDescentGenerator(
-#         l_rate=1E-2,
-#         max_iter=1E5,
-#         iter_mul=10,
-#     )
-#     cg_gen = _opt.ConjugateGradientScipyGenerator(
-#         max_iter=1E5,
-#         iter_mul=10,
-#     )
-#
-#     # model generator
-#     lin_gd_gen = lin_model.get_trainer(
-#         opt_generator=gd_gen,
-#     )
-#     print(next(lin_gd_gen))
-#     print(next(lin_gd_gen))
-#     print(next(lin_gd_gen))
-#     log_cg_gen = log_model.get_trainer(
-#         opt_generator=cg_gen,
-#     )
-#     print(next(log_cg_gen))
-#     print(next(log_cg_gen))
-#     print(next(log_cg_gen))
+if __name__ == '__main__':
+    import optimizer as _opt
+
+    # data
+    lin_d = _np.loadtxt('linear_data.txt', delimiter=',')
+    lin_d = _np.insert(lin_d, 0, values=1, axis=1)
+    lin_x = lin_d[:, :2]
+    lin_y = lin_d[:, 2]
+
+    log_d = _np.loadtxt('logistic_data.txt', delimiter=',')
+    log_d = _np.insert(log_d, 0, values=1, axis=1)
+    log_x = log_d[:, :3]
+    log_y = log_d[:, 3]
+
+    # optimizer
+    gd = _opt.GradientDescent(
+        l_rate=2E-2,
+        max_iter=1E5,
+        g_tol=1E-5,
+        g_norm=2,
+    )
+    cg = _opt.ConjugateGradient(
+        l_rate=2E-2,
+        max_iter=1E5,
+        g_tol=1E-5,
+        g_norm=2,
+    )
+
+    # model
+    lin_model = LinearRegression(lin_x, lin_y)
+    lin_model.train(
+        optimizer=cg,
+    )
+    print(lin_model.result)
+
+    # log_model = LogisticRegression(log_x, log_y)
+    # log_model.train(
+    #     optimizer=cg,
+    # )
+    # print(log_model.result)
+
+    # # generator
+    # gd_gen = _opt.GradientDescentGenerator(
+    #     l_rate=1E-2,
+    #     max_iter=1E5,
+    #     iter_mul=10,
+    # )
+    # cg_gen = _opt.ConjugateGradientScipyGenerator(
+    #     max_iter=1E5,
+    #     iter_mul=10,
+    # )
+    #
+    # # model generator
+    # lin_gd_gen = lin_model.get_trainer(
+    #     opt_generator=gd_gen,
+    # )
+    # print(next(lin_gd_gen))
+    # print(next(lin_gd_gen))
+    # print(next(lin_gd_gen))
+    # log_cg_gen = log_model.get_trainer(
+    #     opt_generator=cg_gen,
+    # )
+    # print(next(log_cg_gen))
+    # print(next(log_cg_gen))
+    # print(next(log_cg_gen))

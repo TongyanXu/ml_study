@@ -27,17 +27,20 @@ def gd_bundle(
 
 
 def cg_bundle(
+        l_rate,
         max_iter,
         g_tol,
         g_norm,
         iter_mul,
 ):
-    cg = opt.ConjugateGradientScipy(
+    cg = opt.ConjugateGradient(
+        l_rate=l_rate,
         max_iter=max_iter,
         g_tol=g_tol,
         g_norm=g_norm,
     )
-    cgg = opt.ConjugateGradientScipyGenerator(
+    cgg = opt.ConjugateGradientGenerator(
+        l_rate=l_rate,
         max_iter=max_iter,
         iter_mul=iter_mul,
     )
@@ -70,10 +73,11 @@ def gd_fig(x_vector, y_vector, figure):
 
 def cg_fig(x_vector, y_vector, figure):
     cg_opt, cg_opt_g = cg_bundle(
-        max_iter=5,
+        l_rate=1.5E-2,
+        max_iter=1E2,
         g_tol=1E-5,
         g_norm=2,
-        iter_mul=1,
+        iter_mul=5,
     )
     return display.lr_anime.make_1d_animation(
         figure=figure,
@@ -86,7 +90,7 @@ def cg_fig(x_vector, y_vector, figure):
         y_label='Profit in $10,000s',
         reset=True,
         reset_pause=3,
-        interval=1000,
+        interval=100,
         contour_center='middle',
     )
 
@@ -100,9 +104,9 @@ if __name__ == '__main__':
     x, y = test_data[:, 0], test_data[:, 1]
     fig = plt.figure(figsize=(8, 7))
 
-    # animation = gd_fig(x, y, fig)
+    animation = gd_fig(x, y, fig)
     # animation.save('gd.gif', writer='pillow')
-    # plt.show()
-    animation = cg_fig(x, y, fig)
-    animation.save('cg.gif', writer='pillow')
-    # plt.show()
+    # animation = cg_fig(x, y, fig)
+    # animation.save('cg.gif', writer='pillow')
+
+    plt.show()
