@@ -5,6 +5,7 @@ import numpy as _np
 import scipy.optimize as _opt
 import optimizer.base as _base
 
+# default config
 _max_iteration = 1E5
 _g_tolerance = 1E-5
 _g_norm = 2
@@ -12,6 +13,8 @@ _iteration_multiplier = 1
 
 
 class ConjugateGradientScipy(_base.OptimizerBase):
+    """conjugate gradient using scipy methods"""
+
     __slots__ = ['max_iter', 'g_tol', 'g_norm']
     __default__ = {
         'max_iter': _max_iteration,
@@ -52,7 +55,9 @@ class ConjugateGradientScipy(_base.OptimizerBase):
         return _base.OptimizeResult(theta, norm_inst, iteration, converge)
 
 
-class ConjugateGradientScipyGenerator(_base.OptimizerGenerator):
+class ConjugateGradientScipySBS(_base.OptimizerSBS):
+    """step-by-step conjugate gradient using scipy methods"""
+
     __slots__ = ['max_iter', 'iter_mul']
     __default__ = {
         'max_iter': _max_iteration,
@@ -62,9 +67,9 @@ class ConjugateGradientScipyGenerator(_base.OptimizerGenerator):
     def __init__(self, max_iter: (float, int) = None, iter_mul: int = None):
         super().__init__(max_iter, iter_mul)
 
-    def get(self, loss: callable, init_val: _np.array,
-            jacob: callable = None, hess: callable = None,
-            ) -> _base.OptimizeGStep:
+    def make(self, loss: callable, init_val: _np.array,
+             jacob: callable = None, hess: callable = None,
+             ) -> _base.OptimizeStepResult:
         theta = init_val.copy()
         last_theta = theta.copy()
 
@@ -81,10 +86,10 @@ class ConjugateGradientScipyGenerator(_base.OptimizerGenerator):
         while i <= self.max_iter:
             if i < len(theta_hist):
                 this_theta = theta_hist[i]
-                yield _base.OptimizeGStep(this_theta, i, last_theta)
+                yield _base.OptimizeStepResult(this_theta, i, last_theta)
                 last_theta = this_theta
             else:
-                yield _base.OptimizeGStep(theta, i, theta)
+                yield _base.OptimizeStepResult(theta, i, theta)
             i += self.iter_mul
 
 

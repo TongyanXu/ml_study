@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-"""optimizer - conjugate descent"""
+"""optimizer - conjugate gradient"""
 
 import numpy as _np
 import optimizer.base as _base
 
+# default config
 _learning_rate = 1E-2
 _max_iteration = 1E5
 _g_tolerance = 1E-5
@@ -12,6 +13,8 @@ _iteration_multiplier = 1
 
 
 class ConjugateGradient(_base.OptimizerBase):
+    """conjugate gradient without line search algorithm"""
+
     __slots__ = ['l_rate', 'max_iter', 'g_tol', 'g_norm']
     __default__ = {
         'l_rate': _learning_rate,
@@ -45,7 +48,9 @@ class ConjugateGradient(_base.OptimizerBase):
         return _base.OptimizeResult(theta, norm_inst, self.max_iter, False)
 
 
-class ConjugateGradientGenerator(_base.OptimizerGenerator):
+class ConjugateGradientSBS(_base.OptimizerSBS):
+    """step-by-step conjugate gradient without line search algorithm"""
+
     __slots__ = ['l_rate', 'max_iter', 'iter_mul']
     __default__ = {
         'l_rate': _learning_rate,
@@ -57,13 +62,13 @@ class ConjugateGradientGenerator(_base.OptimizerGenerator):
                  iter_mul: int = None):
         super().__init__(l_rate, max_iter, iter_mul)
 
-    def get(self, loss: callable, init_val: _np.array,
-            jacob: callable = None, hess: callable = None,
-            ) -> _base.OptimizeGStep:
+    def make(self, loss: callable, init_val: _np.array,
+             jacob: callable = None, hess: callable = None,
+             ) -> _base.OptimizeStepResult:
         i = 0
         theta_pre = init_val.copy()
         theta = theta_pre.copy()
-        yield _base.OptimizeGStep(theta, i, theta_pre)
+        yield _base.OptimizeStepResult(theta, i, theta_pre)
         p, g_square_pre = 0, _np.inf
         while i < self.max_iter:
             for j in range(self.iter_mul):
@@ -74,7 +79,7 @@ class ConjugateGradientGenerator(_base.OptimizerGenerator):
                 theta += self.l_rate * p
                 g_square_pre = g_square
             i += self.iter_mul
-            yield _base.OptimizeGStep(theta, i, theta_pre)
+            yield _base.OptimizeStepResult(theta, i, theta_pre)
             theta_pre = theta.copy()
 
 

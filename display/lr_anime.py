@@ -10,9 +10,13 @@ def _extend(x1, x2, factor=4):
     return x1 * (factor + 1) / factor - x2 / factor
 
 
-def make_1d_animation(figure, x_vector, y_vector, optimizer, optimizer_generator,
-                      init_val=None, x_label='X', y_label='Y',
-                      reset=True, reset_pause=30, interval=100, contour_center='solution'):
+def make_1d_animation(figure, x_vector, y_vector, optimizer, optimizer_sbs, init_val=None,
+                      x_label='X', y_label='Y', reset=True, reset_pause=30, interval=100,
+                      contour_center='solution'):
+    """
+    make animation for single-param linear regression
+
+    """
 
     init_val = _np.zeros(2)
     x_matrix = _np.array([_np.ones(len(x_vector)), x_vector]).T
@@ -98,11 +102,11 @@ def make_1d_animation(figure, x_vector, y_vector, optimizer, optimizer_generator
             self._axes = axes
             self._axes.set_xlabel('Iteration')
             self._axes.set_ylabel('Loss')
-            self._axes.set_xlim((0, optimizer_generator.max_iter))
+            self._axes.set_xlim((0, optimizer_sbs.max_iter))
             self._axes.set_ylim((0, model.loss_function(init_val)))
 
         def update(self, gd_res):
-            iter_p = max(gd_res.iteration - optimizer_generator.iter_mul, 0)
+            iter_p = max(gd_res.iteration - optimizer_sbs.iter_mul, 0)
             x = [iter_p, gd_res.iteration]
             y = [model.loss_function(gd_res.theta_pre),
                  model.loss_function(gd_res.theta)]
@@ -129,7 +133,7 @@ def make_1d_animation(figure, x_vector, y_vector, optimizer, optimizer_generator
     anime_plot = _Plots(figure)
     global_param = {
         'generator': model.get_trainer(
-            opt_generator=optimizer_generator,
+            opt_generator=optimizer_sbs,
             init_val=init_val,
         ),
         'reset_count': 0,
@@ -146,7 +150,7 @@ def make_1d_animation(figure, x_vector, y_vector, optimizer, optimizer_generator
                     global_param['reset_count'] = 0
                     anime_plot.reset()
                     global_param['generator'] = model.get_trainer(
-                        opt_generator=optimizer_generator,
+                        opt_generator=optimizer_sbs,
                         init_val=init_val,
                     )
         else:

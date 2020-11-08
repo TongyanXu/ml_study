@@ -18,7 +18,7 @@ def gd_bundle(
         g_tol=g_tol,
         g_norm=g_norm,
     )
-    gdg = opt.GradientDescentGenerator(
+    gdg = opt.SBS.GradientDescent(
         l_rate=l_rate,
         max_iter=max_iter,
         iter_mul=iter_mul,
@@ -39,7 +39,7 @@ def cg_bundle(
         g_tol=g_tol,
         g_norm=g_norm,
     )
-    cgg = opt.ConjugateGradientGenerator(
+    cgg = opt.SBS.ConjugateGradient(
         l_rate=l_rate,
         max_iter=max_iter,
         iter_mul=iter_mul,
@@ -61,7 +61,7 @@ def gd_fig(x_vector, y_vector, figure):
         y_vector=y_vector,
         init_val=None,
         optimizer=gd_opt,
-        optimizer_generator=gd_opt_g,
+        optimizer_sbs=gd_opt_g,
         x_label='Population of City in 10,000s',
         y_label='Profit in $10,000s',
         reset=True,
@@ -85,7 +85,7 @@ def cg_fig(x_vector, y_vector, figure):
         y_vector=y_vector,
         init_val=None,
         optimizer=cg_opt,
-        optimizer_generator=cg_opt_g,
+        optimizer_sbs=cg_opt_g,
         x_label='Population of City in 10,000s',
         y_label='Profit in $10,000s',
         reset=True,

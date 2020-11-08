@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
-"""optimizer - gradient descent"""
+"""optimizer - gradient descent (steepest descent)"""
 
 import numpy as _np
 import optimizer.base as _base
 
+# default config
 _learning_rate = 1E-3
 _max_iteration = 1E5
 _g_tolerance = 1E-5
@@ -12,6 +13,8 @@ _iteration_multiplier = 1
 
 
 class GradientDescent(_base.OptimizerBase):
+    """simple gradient descent (steepest descent) without line search algorithm"""
+
     __slots__ = ['l_rate', 'max_iter', 'g_tol', 'g_norm']
     __default__ = {
         'l_rate': _learning_rate,
@@ -41,7 +44,9 @@ class GradientDescent(_base.OptimizerBase):
         return _base.OptimizeResult(theta, norm_inst, self.max_iter, False)
 
 
-class GradientDescentGenerator(_base.OptimizerGenerator):
+class GradientDescentSBS(_base.OptimizerSBS):
+    """step-by-step of gradient descent (steepest descent) without line search algorithm"""
+
     __slots__ = ['l_rate', 'max_iter', 'iter_mul']
     __default__ = {
         'l_rate': _learning_rate,
@@ -53,19 +58,19 @@ class GradientDescentGenerator(_base.OptimizerGenerator):
                  iter_mul: int = None):
         super().__init__(l_rate, max_iter, iter_mul)
 
-    def get(self, loss: callable, init_val: _np.array,
-            jacob: callable = None, hess: callable = None,
-            ) -> _base.OptimizeGStep:
+    def make(self, loss: callable, init_val: _np.array,
+             jacob: callable = None, hess: callable = None,
+             ) -> _base.OptimizeStepResult:
         i = 0
         theta_pre = init_val.copy()
         theta = theta_pre.copy()
-        yield _base.OptimizeGStep(theta, i, theta_pre)
+        yield _base.OptimizeStepResult(theta, i, theta_pre)
         while i < self.max_iter:
             for j in range(self.iter_mul):
                 gradient = jacob(theta)
                 theta -= self.l_rate * gradient
             i += self.iter_mul
-            yield _base.OptimizeGStep(theta, i, theta_pre)
+            yield _base.OptimizeStepResult(theta, i, theta_pre)
             theta_pre = theta.copy()
 
 

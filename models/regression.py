@@ -113,12 +113,30 @@ class RegressionModel:
         """
         if init_val is None:
             init_val = _np.zeros(self.n_feature)
-        return opt_generator.get(
+        return opt_generator.make(
             loss=self.loss_function,
             init_val=init_val,
             jacob=self.jacob_function,
             hess=self.hessian_function,
         )
+
+    def predict(self, x_matrix: (_np.array, _np.matrix)):
+        """
+        make prediction after model is trained
+        this will call 'hypothesis' using input x and result theta
+
+        parameters
+        ----------
+        x_matrix: x input for prediction
+            should be numpy array
+
+        returns
+        -------
+        when x_matrix is 1d, return should be a single value
+        when x_matrix is 2d, return should be a numpy array
+        """
+        if self.result is not None:
+            return self.hypothesis(x_matrix, self.result.theta)
 
 
 class LinearRegression(RegressionModel):
@@ -191,19 +209,24 @@ if __name__ == '__main__':
         g_tol=1E-5,
         g_norm=2,
     )
+    cgs = _opt.ConjugateGradientScipy(
+        max_iter=1E5,
+        g_tol=1E-5,
+        g_norm=2,
+    )
 
     # model
-    lin_model = LinearRegression(lin_x, lin_y)
-    lin_model.train(
-        optimizer=cg,
-    )
-    print(lin_model.result)
-
-    # log_model = LogisticRegression(log_x, log_y)
-    # log_model.train(
+    # lin_model = LinearRegression(lin_x, lin_y)
+    # lin_model.train(
     #     optimizer=cg,
     # )
-    # print(log_model.result)
+    # print(lin_model.result)
+
+    log_model = LogisticRegression(log_x, log_y)
+    log_model.train(
+        optimizer=cgs,
+    )
+    print(log_model.result)
 
     # # generator
     # gd_gen = _opt.GradientDescentGenerator(
