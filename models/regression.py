@@ -182,6 +182,26 @@ class LogisticRegression(RegressionModel):
         raise NotImplementedError
 
 
+class RegularizedLogisticRegression(LogisticRegression):
+    """Regularized Logistic Regression Model"""
+
+    def __init__(self, x_matrix: (_np.array, _np.matrix),
+                 y_vector: _np.array, lambda_value: (float, int) = 1):
+        super().__init__(x_matrix=x_matrix, y_vector=y_vector)
+        self.lambda_value = lambda_value
+
+    def loss_function(self, theta: _np.array) -> float:
+        punishment = theta[1:] @ theta[1:] * self.lambda_value / 2 / self.n_sample
+        return super().loss_function(theta) + punishment
+
+    def jacob_function(self, theta: _np.array) -> _np.array:
+        addition = _np.insert(theta[1:], 0, 0) * self.lambda_value / self.n_sample
+        return super().jacob_function(theta) + addition
+
+    def hessian_function(self, theta: _np.array) -> _np.array:
+        raise NotImplementedError
+
+
 if __name__ == '__main__':
     import optimizer as _opt
 
